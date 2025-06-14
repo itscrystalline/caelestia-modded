@@ -99,17 +99,17 @@ Column {
         id: profiles
 
         property string current: {
-            const p = PowerProfiles.profile;
-            if (p === PowerProfile.PowerSaver)
+            const p = AsusCtl.profile;
+            if (p === "LowPower")
                 return saver.icon;
-            if (p === PowerProfile.Performance)
+            if (p === "Performance")
                 return perf.icon;
             return balance.icon;
         }
 
         anchors.horizontalCenter: parent.horizontalCenter
 
-        implicitWidth: saver.implicitHeight + balance.implicitHeight + perf.implicitHeight + Appearance.padding.normal * 2 + Appearance.spacing.large * 2
+        implicitWidth: saver.implicitHeight + balance.implicitHeight + perf.implicitHeight + Appearance.spacing.large * 2
         implicitHeight: Math.max(saver.implicitHeight, balance.implicitHeight, perf.implicitHeight) + Appearance.padding.small * 2
 
         color: Colours.palette.m3surfaceContainer
@@ -128,6 +128,7 @@ Column {
 
                     Fill {
                         item: saver
+                        targetRect: indicator
                     }
                 },
                 State {
@@ -135,6 +136,7 @@ Column {
 
                     Fill {
                         item: balance
+                        targetRect: indicator
                     }
                 },
                 State {
@@ -142,6 +144,7 @@ Column {
 
                     Fill {
                         item: perf
+                        targetRect: indicator
                     }
                 }
             ]
@@ -155,51 +158,165 @@ Column {
             }
         }
 
-        Profile {
+        AsusProfile {
             id: saver
 
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
             anchors.leftMargin: Appearance.padding.small
 
-            profile: PowerProfile.PowerSaver
+            profile: "LowPower"
             icon: "energy_savings_leaf"
         }
 
-        Profile {
+        AsusProfile {
             id: balance
 
             anchors.centerIn: parent
 
-            profile: PowerProfile.Balanced
+            profile: "Balanced"
             icon: "balance"
         }
 
-        Profile {
+        AsusProfile {
             id: perf
 
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
             anchors.rightMargin: Appearance.padding.small
 
-            profile: PowerProfile.Performance
+            profile: "Performance"
             icon: "rocket_launch"
+        }
+    }
+
+    StyledRect {
+        id: powerMode
+
+        property string current: {
+            if (PowerSaveToggle.on) {
+                return powerSave.icon;
+            } else {
+                return normal.icon;
+            }
+        }
+
+        anchors.horizontalCenter: parent.horizontalCenter
+
+        implicitWidth: normal.implicitHeight + powerSave.implicitHeight + Appearance.padding.normal * 2
+        implicitHeight: Math.max(normal.implicitHeight, powerSave.implicitHeight) + Appearance.padding.small * 2
+
+        color: Colours.palette.m3surfaceContainer
+        radius: Appearance.rounding.full
+
+        StyledRect {
+            id: powerModeIndicator
+
+            color: Colours.palette.m3primary
+            radius: Appearance.rounding.full
+            state: powerMode.current
+
+            states: [
+                State {
+                    name: normal.icon
+
+                    Fill {
+                      item: normal
+                      targetRect: powerModeIndicator
+                    }
+                },
+                State {
+                    name: powerSave.icon
+
+                    Fill {
+                        item: powerSave
+                      targetRect: powerModeIndicator 
+                    }
+                }
+            ]
+
+            transitions: Transition {
+                AnchorAnimation {
+                    duration: Appearance.anim.durations.normal
+                    easing.type: Easing.BezierSpline
+                    easing.bezierCurve: Appearance.anim.curves.emphasized
+                }
+            }
+        }
+
+        PowerSaveToggleItem {
+            id: normal
+
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.left: parent.left
+            anchors.leftMargin: Appearance.padding.small
+
+            setOn: false
+            icon: "power"
+        }
+
+        PowerSaveToggleItem {
+            id: powerSave
+
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.right: parent.right
+            anchors.rightMargin: Appearance.padding.small
+
+            setOn: true
+            icon: "battery_saver"
         }
     }
 
     component Fill: AnchorChanges {
         required property Item item
+        required property StyledRect targetRect
 
-        target: indicator
+        target: targetRect
         anchors.left: item.left
         anchors.right: item.right
         anchors.top: item.top
         anchors.bottom: item.bottom
     }
 
-    component Profile: Item {
+    component PowerSaveToggleItem: Item {
         required property string icon
-        required property int profile
+        required property bool setOn
+
+        implicitWidth: icon.implicitHeight + Appearance.padding.small * 2
+        implicitHeight: icon.implicitHeight + Appearance.padding.small * 2
+
+        StateLayer {
+            radius: Appearance.rounding.full
+            color: powerMode.current === parent.icon ? Colours.palette.m3onPrimary : Colours.palette.m3onSurface
+
+            function onClicked(): void {
+                PowerSaveToggle.on = parent.setOn;
+            }
+        }
+
+        MaterialIcon {
+            id: icon
+
+            anchors.centerIn: parent
+
+            text: parent.icon
+            font.pointSize: Appearance.font.size.large
+            color: powerMode.current === text ? Colours.palette.m3onPrimary : Colours.palette.m3onSurface
+            fill: powerMode.current === text ? 1 : 0
+
+            Behavior on fill {
+                NumberAnimation {
+                    duration: Appearance.anim.durations.normal
+                    easing.type: Easing.BezierSpline
+                    easing.bezierCurve: Appearance.anim.curves.standard
+                }
+            }
+        }
+    }
+
+    component AsusProfile: Item {
+        required property string icon
+        required property string profile
 
         implicitWidth: icon.implicitHeight + Appearance.padding.small * 2
         implicitHeight: icon.implicitHeight + Appearance.padding.small * 2
@@ -209,7 +326,7 @@ Column {
             color: profiles.current === parent.icon ? Colours.palette.m3onPrimary : Colours.palette.m3onSurface
 
             function onClicked(): void {
-                PowerProfiles.profile = parent.profile;
+                AsusCtl.profile = parent.profile;
             }
         }
 
