@@ -132,13 +132,11 @@ Singleton {
         id: gpuUsage
 
         running: true
-        command: ["sh", "-c", "cat /sys/class/drm/card*/device/gpu_busy_percent"]
+        command: ["sh", "-c", "nvtop -s | jq '.[0].gpu_util'"]
         stdout: SplitParser {
-            splitMarker: ""
             onRead: data => {
-                const percs = data.trim().split("\n");
-                const sum = percs.reduce((acc, d) => acc + parseInt(d, 10), 0);
-                root.gpuPerc = sum / percs.length / 100;
+                const percs = parseInt(data.substring(1, data.length - 2));
+                root.gpuPerc = percs / 100.0;
             }
         }
     }
@@ -147,26 +145,10 @@ Singleton {
         id: gpuTemp
 
         running: true
-        command: ["sh", "-c", "sensors | jq -nRc '[inputs]'"]
+        command: ["sh", "-c", "nvtop -s | jq '.[0].temp'"]
         stdout: SplitParser {
             onRead: data => {
-                let eligible = false;
-                let sum = 0;
-                let count = 0;
-                for (const line of JSON.parse(data)) {
-                    if (line === "Adapter: PCI adapter")
-                        eligible = true;
-                    else if (line === "")
-                        eligible = false;
-                    else if (eligible) {
-                        const match = line.match(/^(temp[0-9]+|GPU core|edge)+:\s+\+([0-9]+\.[0-9]+)°C/);
-                        if (match) {
-                            sum += parseFloat(match[2]);
-                            count++;
-                        }
-                    }
-                }
-                root.gpuTemp = count > 0 ? sum / count : 0;
+                root.gpuTemp = data ? parseInt(data.substring(1, data.length - 2)) : 0;
             }
         }
     }
