@@ -2,6 +2,7 @@ pragma Singleton
 pragma ComponentBehavior: Bound
 
 import "root:/widgets"
+import "root:/services"
 import Quickshell
 import Quickshell.Io
 import QtQuick
@@ -14,6 +15,10 @@ Singleton {
 
     function getMonitorForScreen(screen: ShellScreen): var {
         return monitors.find(m => m.modelData === screen);
+    }
+
+    function getMonitorForScreenName(name: string): var {
+        return monitors.find(m => m.modelData.name === name);
     }
 
     function increaseBrightness(): void {
@@ -101,6 +106,9 @@ Singleton {
             if (Math.round(brightness * 100) === rounded)
                 return;
             brightness = value;
+            if (modelData.name == "eDP-1") {
+                PowerSaveToggle.setBrightness(brightness);
+            }
             setProc.command = isDdc ? ["ddcutil", "-b", busNum, "setvcp", "10", rounded] : ["brightnessctl", "s", `${rounded}%`];
             setProc.startDetached();
         }
