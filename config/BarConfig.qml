@@ -14,6 +14,7 @@ Singleton {
         property int windowPreviewSize: 400
         property int trayMenuWidth: 300
         property int batteryWidth: 250
+        property int screenMirroringWidth: 100
     }
 
     component Workspaces: QtObject {

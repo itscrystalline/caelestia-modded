@@ -31,6 +31,9 @@ Item {
         const b = statusIconsInner.battery;
         const by = statusIcons.y + statusIconsInner.y + b.y - spacing / 2;
 
+        const sm = statusIconsInner.screenMirror;
+        const smy = statusIcons.y + statusIconsInner.y + sm.y - spacing / 2;
+
         if (y >= awy && y <= awy + aw.implicitHeight) {
             popouts.currentName = "activewindow";
             popouts.currentCenter = Qt.binding(() => activeWindow.y + aw.y + aw.implicitHeight / 2);
@@ -53,6 +56,10 @@ Item {
         } else if (y >= by && y <= by + b.implicitHeight + spacing) {
             popouts.currentName = "battery";
             popouts.currentCenter = Qt.binding(() => statusIcons.y + statusIconsInner.y + b.y + b.implicitHeight / 2);
+            popouts.hasCurrent = true;
+        } else if (y >= smy && y <= smy + sm.implicitHeight + spacing) {
+            popouts.currentName = "screenmirroring";
+            popouts.currentCenter = Qt.binding(() => statusIcons.y + statusIconsInner.y + sm.y + sm.implicitHeight / 2);
             popouts.hasCurrent = true;
         } else {
             popouts.hasCurrent = false;

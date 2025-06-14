@@ -48,6 +48,11 @@ Item {
             source: "Battery.qml"
         }
 
+        Popout {
+            name: "screenmirroring"
+            source: "ScreenMirroring.qml"
+        }
+
         Repeater {
             model: ScriptModel {
                 values: [...SystemTray.items.values]

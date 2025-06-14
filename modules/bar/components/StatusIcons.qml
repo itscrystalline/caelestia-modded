@@ -15,10 +15,11 @@ Item {
     readonly property real bs: bluetooth.y
     readonly property real be: repeater.count > 0 ? devices.y + devices.implicitHeight : bluetooth.y + bluetooth.implicitHeight
     readonly property Item battery: battery
+    readonly property Item screenMirror: screenMirror
 
     clip: true
-    implicitWidth: Math.max(network.implicitWidth, bluetooth.implicitWidth, devices.implicitWidth, battery.implicitWidth)
-    implicitHeight: network.implicitHeight + bluetooth.implicitHeight + bluetooth.anchors.topMargin + (repeater.count > 0 ? devices.implicitHeight + devices.anchors.topMargin : 0) + battery.implicitHeight + battery.anchors.topMargin
+    implicitWidth: Math.max(network.implicitWidth, bluetooth.implicitWidth, devices.implicitWidth, battery.implicitWidth, screenMirror.implicitWidth)
+    implicitHeight: network.implicitHeight + bluetooth.implicitHeight + bluetooth.anchors.topMargin + (repeater.count > 0 ? devices.implicitHeight + devices.anchors.topMargin : 0) + battery.implicitHeight + battery.anchors.topMargin + screenMirror.implicitHeight + screenMirror.anchors.topMargin
 
     MaterialIcon {
         id: network
@@ -94,6 +95,18 @@ Item {
         }
         color: !UPower.onBattery || UPower.displayDevice.percentage > 0.2 ? root.colour : Colours.palette.m3error
         fill: 1
+    }
+
+    MaterialIcon {
+        id: screenMirror
+
+        anchors.horizontalCenter: devices.horizontalCenter
+        anchors.top: battery.bottom
+        anchors.topMargin: Appearance.spacing.small
+
+        animate: true
+        text: ScreenMirroring.mirroring ? "screen_share" : "screenshot_monitor"
+        color: root.colour
     }
 
     Behavior on implicitWidth {
