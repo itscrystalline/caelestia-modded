@@ -38,10 +38,10 @@ Item {
             text: qsTr("Performance")
         }
 
-        Tab {
-            iconName: "workspaces"
-            text: qsTr("Workspaces")
-        }
+        // Tab {
+        //     iconName: "workspaces"
+        //     text: qsTr("Workspaces")
+        // }
     }
 
     Item {
@@ -55,7 +55,7 @@ Item {
 
         x: {
             const tab = bar.currentItem;
-            const width = (root.nonAnimWidth - DashboardConfig.sizes.tabIndicatorSpacing * (bar.count - 1) * 2) / bar.count
+            const width = (root.nonAnimWidth - DashboardConfig.sizes.tabIndicatorSpacing * (bar.count - 1) * 2) / bar.count;
             return width * tab.TabBar.index + (width - tab.implicitWidth) / 2;
         }
 
@@ -69,7 +69,6 @@ Item {
 
             color: Colours.palette.m3primary
             radius: Appearance.rounding.full
-
         }
 
         Behavior on x {
@@ -108,14 +107,17 @@ Item {
 
             cursorShape: Qt.PointingHandCursor
 
-            onPressed: ({x,y}) => {
+            onPressed: ({
+                    x,
+                    y
+                }) => {
                 tab.TabBar.tabBar.setCurrentIndex(tab.TabBar.index);
 
                 const stateY = stateWrapper.y;
                 rippleAnim.x = x;
                 rippleAnim.y = y - stateY;
 
-                const dist = (ox,oy) => ox * ox + oy * oy;
+                const dist = (ox, oy) => ox * ox + oy * oy;
                 const stateEndY = stateY + stateWrapper.height;
                 rippleAnim.radius = Math.sqrt(Math.max(dist(0, stateY), dist(0, stateEndY), dist(width, stateY), dist(width, stateEndY)));
 
@@ -237,7 +239,6 @@ Item {
                 text: tab.text
                 color: tab.current ? Colours.palette.m3primary : Colours.palette.m3onSurfaceVariant
             }
-
         }
     }
 
