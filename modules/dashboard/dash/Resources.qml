@@ -26,7 +26,7 @@ Row {
     }
 
     Resource {
-        icon: "hard_disk"
+        icon: "storage"
         value: SystemUsage.storagePerc
         colour: Colours.palette.m3tertiary
     }
