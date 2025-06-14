@@ -34,7 +34,9 @@ Item {
 
             model: SystemTray.items
 
-            TrayItem {}
+            TrayItem {
+                sizeMultiplier: SystemTray.items.values.length > 4 ? 1.5 : 2
+            }
         }
     }
 
