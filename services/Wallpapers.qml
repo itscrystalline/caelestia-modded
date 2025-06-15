@@ -99,8 +99,8 @@ Singleton {
     Process {
         running: true
         command: ["find", root.path, "-type", "d", "-path", '*/.*', "-prune", "-o", "-not", "-name", '.*', "-type", "f", "-print"]
-        stdout: StdioCollector {
-            onStreamFinished: wallpapers.model = text.trim().split("\n").filter(w => root.extensions.includes(w.slice(w.lastIndexOf(".") + 1))).sort()
+        stdout: SplitParser {
+            onRead: data => wallpapers.model = data.trim().split("\n").filter(w => root.extensions.includes(w.slice(w.lastIndexOf(".") + 1))).sort()
         }
     }
 
